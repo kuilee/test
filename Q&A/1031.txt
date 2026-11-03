@@ -1,0 +1,630 @@
+Question
+What is the difference between intermediate and terminal operations in a Java Stream pipeline?
+
+Intermediate Operations (Max 2)
+
+Intermediate operations return another Stream and can be chained.
+
+
+They are lazy and do not process elements until a terminal operation is invoked.
+
+
+Examples include filter, map, distinct, sorted, limit, and skip.
+
+
+They describe transformations or selections to apply to stream elements.
+
+Terminal Operations (Max 2)
+
+Terminal operations produce a result or side effect and end the pipeline.
+
+
+Invoking a terminal operation triggers execution of the pipeline.
+
+
+After a terminal operation, the stream cannot be reused.
+
+
+Examples include collect, reduce, forEach, count, anyMatch, and findFirs
+
+--
+Question
+What happens when this code executes, and why?
+
+Integer count = null;
+int value = count;
+What Happens
+
+The code throws NullPointerException at runtime.
+
+Why (Max 2)
+
+Assigning Integer to int requires unboxing.
+
+
+A null wrapper cannot be unboxed to a primitive.
+
+
+Wrapper types are nullable, unlike primitive int.
+
+---
+Question
+What is object polymorphism in Java, and how does it help you write flexible code?
+
+What Is Polymorphism (Max 2)
+
+Polymorphism allows the same interface or superclass type to refer to different concrete implementations.
+
+
+The method that runs is chosen at runtime based on the actual object type (dynamic dispatch).
+
+
+Subtypes can override behavior while callers program to a common abstraction.
+
+
+It is closely related to inheritance and interface implementation.
+
+Why Useful (Max 2)
+
+Lets you extend behavior by adding new implementations without changing callers.
+
+
+Reduces coupling to concrete classes.
+
+
+Enables interchangeable strategies behind a shared API.
+
+
+Makes code easier to test with alternate implementations or fakes.
+----
+Question
+Although this code works correctly for submitting work, it has a design problem. What is the problem, how would you improve the design, and why?
+
+public void process(List&lt;Runnable&gt; tasks) {
+    ExecutorService executor = Executors.newFixedThreadPool(4);
+    for (Runnable task : tasks) {
+        executor.submit(task);
+    }
+}
+Design Problem
+
+The ExecutorService is never shut down.
+
+
+Failing to shut down leaves threads running and can leak resources.
+
+Possible Improvements (Max 2)
+
+Call shutdown after submitting tasks, and awaitTermination when results must complete.
+
+
+Use try/finally to ensure shutdown even if submission fails.
+
+
+Prefer a shared, lifecycle-managed executor instead of creating one per method call when appropriate.
+
+Why (Max 2)
+
+Executor services own threads that will not exit until shut down.
+
+
+Proper shutdown prevents thread and memory leaks in long-running applications.
+
+
+Makes task execution lifecycle explicit and safer.
+---
+Question
+How would you improve this code using Map.computeIfAbsent, and why is that improvement useful?
+
+Map&lt;String, List&lt;String&gt;&gt; tagsByUser = new HashMap&lt;&gt;();
+
+public void addTag(String userId, String tag) {
+    List&lt;String&gt; tags = tagsByUser.get(userId);
+    if (tags == null) {
+        tags = new ArrayList&lt;&gt;();
+        tagsByUser.put(userId, tags);
+    }
+    tags.add(tag);
+}
+Improvement (Max 2)
+
+Replace the get/null-check/put pattern with computeIfAbsent.
+
+
+Use tagsByUser.computeIfAbsent(userId, id -> new ArrayList<>()).add(tag).
+
+
+computeIfAbsent creates and inserts the value only when the key is absent or mapped to null.
+
+
+The mapping function runs only when initialization is needed.
+
+Why Useful (Max 2)
+
+Makes lazy initialization of map values concise and less error-prone.
+
+
+Avoids duplicating lookup and insert logic.
+
+
+Expresses the intent of “initialize if missing, then use” clearly.
+
+
+Reduces the chance of forgetting to put the new list into the map.
+---
+Question
+Given the code below, how would you refactor it using a lambda expression?
+
+interface Calculator {
+    int operate(int a, int b);
+}
+
+Calculator add = new Calculator() {
+    public int operate(int a, int b) {
+        return a + b;
+    }
+}
+Lambda Expression
+
+Replace the anonymous Calculator implementation with a lambda expression. This is possible because Calculator is a functional interface with a single abstract method.
+
+--
+Question
+How is the yield statement used in switch expressions, and why would you use it?
+
+How yield Is Used
+
+The yield statement returns a value from a block within a switch expression.
+
+
+It is used when additional statements or logic are needed before returning the result of a case.
+
+Why to Use yield (Max 2)
+
+Allows multiple statements to be executed before returning a value.
+
+
+Improves readability by keeping the logic and returned value together.
+
+
+Eliminates the need for temporary variables when computing a result.
+
+
+Supports more expressive and concise switch expressions.
+---
+Question
+What are some key differences between ArrayList and LinkedList in Java, and when would you choose one over the other?
+
+Key Differences (Max 4)
+
+ArrayList is backed by a resizable array.
+
+
+ArrayList provides fast indexed access.
+
+
+ArrayList is usually better for iteration and general-purpose list usage.
+
+
+LinkedList is backed by a doubly linked list.
+
+
+LinkedList has slower indexed access because it must traverse nodes.
+
+
+LinkedList can be useful for frequent insertions or removals when the node position is already known.
+
+
+LinkedList generally has more memory overhead because each node stores links to neighboring nodes.
+
+When to Use
+
+Use ArrayList for most general-purpose list use cases, especially when reading, iterating, or accessing by index.
+
+
+Use LinkedList when frequent insertions/removals at the beginning, end, or known iterator position are more important than indexed access.
+---
+Question
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class FileLoader {
+
+    public String readFirstLine(String fileName) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        return reader.readLine();
+    }
+}
+Design Problem
+
+The BufferedReader is never closed.
+
+
+Failing to close the resource can lead to resource leaks.
+
+Possible Improvements (Max 2)
+
+Use a try-with-resources statement.
+
+
+Ensure the BufferedReader is automatically closed after use.
+
+
+Avoid relying on callers or garbage collection to release the resource.
+
+Why (Max 2)
+
+Ensures resources are always closed, even if an exception occurs.
+
+
+Reduces the risk of resource leaks.
+
+
+Produces safer and more maintainable code.
+
+
+Simplifies resource management by eliminating the need for explicit cleanup in a finally block.
+---
+Question
+What is the difference between throw and throws in Java?
+
+throw (Max 2)
+
+throw is used to raise an exception at runtime.
+
+
+It appears inside a method body with an exception instance, such as throw new IllegalArgumentException(…).
+
+
+After throw executes, normal control flow stops and the exception propagates unless caught.
+
+
+throw is about producing and signaling a failure.
+
+throws (Max 2)
+
+throws is used in a method declaration to declare checked exceptions the method may propagate.
+
+
+It informs callers that they must handle or further declare those checked exceptions.
+
+
+throws does not itself raise an exception; it documents and enforces the method’s exception contract.
+
+
+Unchecked exceptions do not need to be declared with throws.
+---
+Question
+What is printed when this code executes, and why?
+
+Set&lt;String&gt; names = new HashSet&lt;&gt;();
+names.add("Ada");
+names.add("Alan");
+names.add("Ada");
+System.out.println(names.size());
+Output
+
+Prints 2.
+
+Why (Max 2)
+
+HashSet stores unique elements based on equals and hashCode.
+
+
+The second “Ada” is considered equal to the first and is not added as a new element.
+
+
+Duplicate values according to equals do not increase the set size.
+---
+Question
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+public class BankAccount {
+    public double balance;
+
+    public BankAccount(double balance) {
+        this.balance = balance;
+    }
+
+    public void deposit(double amount) {
+        balance += amount;
+    }
+}
+Design Problem
+
+The balance field is public, so callers can modify it directly.
+
+
+Direct field access bypasses any validation or business rules the class should enforce.
+
+Possible Improvements (Max 2)
+
+Make balance private and expose controlled methods such as deposit, withdraw, and getBalance.
+
+
+Validate amounts inside mutator methods so invariants cannot be broken.
+
+
+Avoid exposing mutable state that represents core domain invariants.
+
+Why (Max 2)
+
+Encapsulation protects invariants by controlling how state changes.
+
+
+Centralizes validation and business rules in one place.
+
+
+Makes the class safer and easier to maintain as requirements evolve
+--
+Question
+How would you refactor this code using Optional.map, and why is that improvement useful?
+
+public String cityName(Optional&lt;User&gt; user) {
+    if (user.isPresent()) {
+        Address address = user.get().getAddress();
+        if (address != null) {
+            return address.getCity();
+        }
+    }
+    return "Unknown";
+}
+Refactor (Max 2)
+
+Chain Optional.map calls to transform a present value.
+
+
+Use user.map(User::getAddress).map(Address::getCity).orElse(“Unknown”).
+
+
+map applies the function only when a value is present and propagates emptiness otherwise.
+
+
+Avoid nested isPresent/get checks when map expresses the transformation clearly.
+
+Why Useful (Max 2)
+
+Makes absence handling explicit and concise.
+
+
+Reduces nested null and presence checks.
+
+
+Keeps the happy-path transformation readable as a pipeline.
+
+
+Encourages safer Optional usage than repeated get calls.
+---
+Question
+What happens when this code executes, and why?
+
+class User {
+    String name;
+}
+
+Set&lt;User&gt; users = new TreeSet&lt;&gt;();
+users.add(new User());
+users.add(new User());
+What Happens
+
+The code throws ClassCastException at runtime.
+
+Why (Max 2)
+
+TreeSet keeps elements in sorted order using natural ordering or a Comparator.
+
+
+Natural ordering requires elements to implement Comparable.
+
+
+User does not implement Comparable.
+---
+Question
+How would you improve this error handling so failures are more expressive, and why?
+
+public Order getOrder(String id) {
+    Order order = repository.find(id);
+    if (order == null) {
+        throw new RuntimeException("missing");
+    }
+    return order;
+}
+Improvement (Max 2)
+
+Introduce a domain-specific exception such as OrderNotFoundException.
+
+
+Include identifying context such as the order id in the exception message or fields.
+
+
+Prefer a dedicated unchecked or checked exception that names the failure mode.
+
+
+Avoid generic RuntimeException for expected domain failures.
+
+Why (Max 2)
+
+Domain exceptions communicate intent to callers and operators more clearly.
+
+
+Callers can catch and handle specific failure types appropriately.
+
+
+Improves diagnostics and API readability at abstraction boundaries.
+
+
+Makes error contracts part of the domain model rather than opaque runtime failures
+---
+Question
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+public class OrderService {
+    public void placeOrder(Order order) {
+        validate(order);
+        database.save(order);
+        emailClient.sendConfirmation(order);
+        metrics.increment("orders.placed");
+    }
+}
+Design Problem
+
+OrderService mixes validation, persistence, notification, and metrics in one place.
+
+
+The class has multiple reasons to change, violating the Single Responsibility Principle.
+
+Possible Improvements (Max 2)
+
+Split persistence, notification, and metrics into focused collaborators.
+
+
+Keep OrderService as an orchestrator that delegates to specialized components.
+
+
+Isolate side effects so each component has one clear responsibility.
+
+Why (Max 2)
+
+Focused classes are easier to test, reason about, and change independently.
+
+
+Reduces coupling between unrelated concerns such as email and database details.
+
+
+Improves maintainability as the order workflow evolves.
+---
+Question
+Given the code below, how would you refactor it using a lambda expression?
+
+List<String> words = Arrays.asList("Java", "Lambda", "Expression");
+
+Collections.sort(words, new Comparator&lt;String&gt;() {
+    @Override
+    public int compare(String s1, String s2) {
+        return s1.length() - s2.length();
+    }
+});</code></pre>
+Lambda Expression
+
+Replace the anonymous Comparator implementation with a lambda expression. This is possible because Comparator is a functional interface with a single abstract method.
+
+---
+Question
+What is pattern matching for instanceof in Java, and what are some of its benefits?
+
+if (obj instanceof String s) {
+    System.out.println(s.length());
+}
+What It Is
+
+Pattern matching for instanceof lets Java check an object’s type and declare a typed variable in the same expression, avoiding a separate explicit cast.
+
+Benefits (Max 3)
+
+Reduces boilerplate by removing the need for a separate cast.
+
+
+Improves readability by keeping the type check and typed variable together.
+
+
+Improves type safety because the variable is only available where the type check succeeds.
+
+
+Reduces the risk of casting errors.
+
+
+Makes code involving type-specific logic easier to maintain.
+----
+Question
+What are the key differences between Comparable and Comparator in Java, and when would you use each?
+
+Key Differences (Max 4)
+
+Comparable defines the natural ordering of a class, while Comparator defines an external ordering.
+
+
+Comparable requires modifying the class by implementing the Comparable interface, while Comparator can be implemented separately without changing the class.
+
+
+Comparable defines a single default ordering, while multiple Comparator implementations can provide different sorting strategies.
+
+
+Comparable implements the compareTo() method, while Comparator implements the compare() method.
+
+
+Comparable is typically implemented by the class being sorted, while Comparator is supplied to sorting methods or collections when needed.
+
+When to Use
+
+Use Comparable when a class has a single, natural ordering that should always be available.
+
+
+Use Comparator when different sort orders are required or when the class cannot or should not implement Comparable.
+
+---
+Question
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+import java.util.HashMap;
+import java.util.Map;
+
+class User {
+    private String username;
+
+    User(String username) {
+        this.username = username;
+    }
+
+    void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof User other
+            && username.equals(other.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return username.hashCode();
+    }
+}
+
+Map&lt;User, String&gt; userRoles = new HashMap&lt;&gt;();
+
+User user = new User("alice");
+userRoles.put(user, "Administrator");
+
+user.setUsername("bob");
+
+System.out.println(userRoles.get(user));
+Design Problem
+
+The object used as the HashMap key is mutable. Changing a field that is used by equals() and hashCode() after the object has been added to the map can prevent the entry from being found correctly.
+
+Possible Improvements (Max 2)
+
+Make the key object immutable.
+
+
+Do not modify fields that participate in equals() and hashCode() while the object is used as a map key.
+
+
+Alternatively, use an immutable identifier as the key (for example, String or UUID).
+
+Why (Max 2)
+
+Maintains a consistent hash code while the object is stored in the map.
+
+
+Preserves the HashMap contract and lookup behavior.
+
+
+Prevents difficult-to-diagnose lookup bugs.
+
+
+Produces more predictable and maintainable code.

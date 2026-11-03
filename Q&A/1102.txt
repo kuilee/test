@@ -1,0 +1,702 @@
+Question
+What is an enum in Java, and why is it useful for modeling a finite set of values?
+
+What Is an Enum (Max 2)
+
+An enum defines a fixed set of named constant instances of a type.
+
+
+Enum constants are type-safe alternatives to string or int constants.
+
+
+Each enum constant is a singleton instance of the enum type.
+
+
+Enums can declare fields, constructors, and methods in addition to constants.
+
+Why Useful (Max 2)
+
+Restricts values to a known domain at compile time.
+
+
+Improves readability compared with magic strings or numbers.
+
+
+Enables exhaustive handling in switch expressions when all constants are covered.
+
+
+Reduces invalid-state bugs caused by unexpected literal values.
+---
+
+What is the difference between Collectors.toList() and Stream.toList()?
+
+Collectors.toList() (Max 2)
+
+Collectors.toList() is used with collect and returns a List.
+
+
+The API contract does not guarantee the List’s concrete type, mutability, serializability, or thread-safety.
+
+
+It has been available since Streams were introduced and is widely used in older codebases.
+
+
+Relying on mutability of the result is unsafe because that behavior is not guaranteed.
+
+Stream.toList() (Max 2)
+
+Stream.toList() is a terminal operation that returns an unmodifiable List.
+
+
+It is a more concise alternative to collect(Collectors.toList()) when an unmodifiable snapshot is desired.
+
+
+Attempting to structurally modify the result throws UnsupportedOperationException.
+
+
+Prefer Stream.toList() when you want a guaranteed unmodifiable list of results.
+
+---
+What happens when this code executes, and why?
+
+interface Greeter {
+    default String greet() {
+        return "Hello";
+    }
+}
+
+interface LoudGreeter {
+    default String greet() {
+        return "HELLO";
+    }
+}
+
+class Bot implements Greeter, LoudGreeter {
+    @Override
+    public String greet() {
+        return Greeter.super.greet() + "!";
+    }
+}
+
+System.out.println(new Bot().greet());
+Output
+
+Prints Hello!
+
+Why (Max 3)
+
+Implementing two interfaces with the same default method creates a conflict that must be resolved.
+
+
+Bot overrides greet and explicitly chooses Greeter.super.greet().
+
+
+Without an overriding method, the code would not compile due to the default-method conflict.
+
+
+InterfaceName.super.method() selects which default implementation to call.
+
+---
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+List&lt;String&gt; active = new ArrayList&lt;&gt;();
+users.stream()
+    .filter(User::isActive)
+    .forEach(user -> active.add(user.getName()));
+Design Problem
+
+The stream operation mutates external state inside forEach.
+
+
+Relying on side effects makes the pipeline harder to reason about and less declarative.
+
+Possible Improvements (Max 2)
+
+Collect results with map and toList or collect instead of mutating a list in forEach.
+
+
+Prefer pure intermediate operations and a terminal collector for aggregation.
+
+
+Avoid using forEach for building collections when a collector expresses the intent better.
+
+Why (Max 2)
+
+Declarative collectors are clearer and less error-prone than side-effecting accumulation.
+
+
+Side-effecting stream code is harder to parallelize safely.
+
+
+Keeps stream pipelines focused on transformation rather than hidden mutation.
+
+---
+Question
+What is a Stream pipeline in Java, and how does it process a collection of data?
+
+What Is a Stream Pipeline (Max 2)
+
+A Stream pipeline is a sequence of operations that process elements from a data source declaratively.
+
+
+It typically consists of a source, zero or more intermediate operations, and a terminal operation.
+
+
+Streams do not store data themselves; they convey elements from a source through operations.
+
+
+Pipelines express what should happen to the data rather than how to iterate over it manually.
+
+How It Processes Data (Max 2)
+
+Intermediate operations build a pipeline of transformations that is executed when a terminal operation runs.
+
+
+Elements are processed through the pipeline, often one at a time, without requiring an explicit loop.
+
+
+The terminal operation produces a result or a side effect and completes the pipeline.
+
+
+This style makes filtering, mapping, and aggregation more concise and readable than imperative loops.
+
+--
+What happens when this code executes, and why?
+
+List&lt;String&gt; languages = Arrays.asList("Java", "Kotlin");
+languages.set(0, "Scala");
+languages.add("Groovy");
+What Happens
+
+set succeeds, but add throws UnsupportedOperationException.
+
+Why (Max 2)
+
+Arrays.asList returns a fixed-size List backed by the original array.
+
+
+Element replacement with set is allowed because it does not change the list size.
+
+
+Structural modifications such as add or remove are not allowed on the fixed-size view.
+---
+What is the difference between composition and inheritance in Java, and when would you prefer one over the other?
+
+Key Differences (Max 2)
+
+Inheritance models an is-a relationship by extending a superclass.
+
+
+Composition models a has-a relationship by holding references to other objects.
+
+
+Inheritance tightly couples a subclass to its parent’s implementation and hierarchy.
+
+
+Composition allows behavior to be reused by delegating to collaborator objects.
+
+
+A class can extend only one superclass but can compose many objects.
+
+When to Prefer (Max 2)
+
+Prefer composition when you need flexible reuse without committing to a rigid class hierarchy.
+
+
+Prefer inheritance when a true subtype relationship exists and polymorphic substitution is required.
+
+
+Composition is often safer for evolving designs because dependencies can be swapped or reconfigured.
+
+--
+Question
+Given the code below, how would you refactor it using a lambda expression?
+
+Function<String, Integer> lengthFunction = new Function<String, Integer>() {
+    @Override
+    public Integer apply(String s) {
+        return s.length();
+    }
+};
+Lambda Expression
+
+Replace the anonymous Function implementation with a lambda expression - s -> s.length(). This is possible because Function is a functional interface with a single abstract method.
+
+---
+Question
+What is local variable type inference with var in Java, and when should it be used carefully?
+
+What It Is
+
+var allows the compiler to infer the type of a local variable from its initializer.
+
+
+The inferred type is determined at compile time; Java remains statically typed.
+
+When to Use Carefully (Max 2)
+
+Use var when the inferred type is obvious from the initializer.
+
+
+Avoid var when it makes the code harder to read.
+
+
+Prefer explicit types when they improve code clarity.
+
+
+Use var to reduce unnecessary repetition without sacrificing readability
+
+--
+Question
+What is the difference between structural and non-structural modifications in Java collections?
+
+Structural Modifications (Max 1)
+
+Structural modifications change the size or internal structure of a collection, such as adding or removing elements.
+
+
+Structural modifications can invalidate iterators and may cause a ConcurrentModificationException when a collection is modified during iteration.
+
+Non-Structural Modifications (Max 1)
+
+Non-structural modifications do not change the size or structure of the collection.
+
+
+Examples include replacing an existing element (for example, using List.set()) or updating the state of an element already stored in the collection.
+--
+Question
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class OrderService {
+
+    private final List<String> orders = new ArrayList<>();
+
+    public void addOrder(String orderId) {
+        orders.add(orderId);
+    }
+
+    public List<String> getOrders() {
+        return orders;
+    }
+}
+Design Problem
+
+The class exposes its internal mutable collection directly, allowing callers to modify its internal state.
+
+Possible Improvements (Max 2)
+
+Return an unmodifiable view of the collection.
+
+
+Return a defensive copy of the collection.
+
+
+Avoid exposing mutable internal state directly.
+
+Why (Max 2)
+
+Preserves encapsulation.
+
+
+Prevents unintended modification of the object’s internal state.
+
+
+Produces safer and more maintainable code.
+
+
+Reduces bugs caused by shared mutable state.
+
+--
+Question
+What is the purpose of Optional in Java, and when is it appropriate to use?
+
+Purpose (Max 2)
+
+Optional is a container that may or may not hold a non-null value.
+
+
+It makes the possibility of absence explicit in method return types.
+
+
+It encourages callers to handle missing values intentionally rather than relying on null.
+
+
+It provides APIs such as map, flatMap, filter, and orElse for safe presence handling.
+
+When Appropriate (Max 2)
+
+Appropriate as a return type when a value might legitimately be absent.
+
+
+Not recommended as a field type or method parameter in most APIs.
+
+
+Should not replace every nullable reference; use it where absence is part of the contract.
+
+
+Prefer clear domain modeling of absence over returning null from lookup-style methods.
+
+---
+Question
+What happens when this code executes, and why?
+
+List&lt;String&gt; languages = List.of("Java", "Kotlin", "Scala");
+languages.add("Groovy");
+What Happens
+
+The code throws UnsupportedOperationException at runtime.
+
+Why (Max 2)
+
+List.of creates an immutable list.
+
+
+Structural modifications such as add, remove, or clear are not allowed.
+
+
+Attempting to modify the list fails fast rather than silently mutating shared data
+
+--
+Question
+What is the difference between method overloading and method overriding in Java?
+
+Overloading (Max 2)
+
+Overloading defines multiple methods with the same name but different parameter lists.
+
+
+Which overloaded method to call is resolved at compile time based on argument types.
+
+
+Overloading can occur within the same class and does not require inheritance.
+
+
+Return type alone is not enough to distinguish overloaded methods.
+
+Overriding (Max 2)
+
+Overriding redefines an inherited instance method with the same signature in a subclass.
+
+
+Which overridden method runs is resolved at runtime based on the actual object type.
+
+
+Overriding supports polymorphism through dynamic dispatch.
+
+
+The overridden method typically keeps a compatible return type and cannot narrow checked exceptions arbitrarily.
+
+---
+Question
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+import java.util.List;
+
+public record Team(String name, List&lt;String&gt; members) {
+}
+
+// usage
+List&lt;String&gt; members = new ArrayList&lt;&gt;(List.of("Ada", "Alan"));
+Team team = new Team("Platform", members);
+members.add("Grace");
+Design Problem
+
+The record stores a mutable List component without defensive copying.
+
+
+Callers can mutate the original list after construction, changing the record’s apparent state.
+
+Possible Improvements (Max 2)
+
+Defensively copy the list in a compact constructor and store an unmodifiable view or copy.
+
+
+Use List.copyOf(members) so the component is an immutable snapshot.
+
+
+Avoid exposing mutable collections as record components when true immutability is required.
+
+Why (Max 2)
+
+Records provide shallow immutability; mutable component contents can still change.
+
+
+Defensive copying preserves invariants and makes equality/hashCode stable over time.
+
+
+Prevents unexpected shared mutable state between the record and its callers.
+
+---
+Question
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+import java.util.List;
+
+public record Team(String name, List&lt;String&gt; members) {
+}
+
+// usage
+List&lt;String&gt; members = new ArrayList&lt;&gt;(List.of("Ada", "Alan"));
+Team team = new Team("Platform", members);
+members.add("Grace");
+Design Problem
+
+The record stores a mutable List component without defensive copying.
+
+
+Callers can mutate the original list after construction, changing the record’s apparent state.
+
+Possible Improvements (Max 2)
+
+Defensively copy the list in a compact constructor and store an unmodifiable view or copy.
+
+
+Use List.copyOf(members) so the component is an immutable snapshot.
+
+
+Avoid exposing mutable collections as record components when true immutability is required.
+
+Why (Max 2)
+
+Records provide shallow immutability; mutable component contents can still change.
+
+
+Defensive copying preserves invariants and makes equality/hashCode stable over time.
+
+
+Prevents unexpected shared mutable state between the record and its callers.
+
+--
+Question
+What is the difference between method overloading and method overriding in Java?
+
+Overloading (Max 2)
+
+Overloading defines multiple methods with the same name but different parameter lists.
+
+
+Which overloaded method to call is resolved at compile time based on argument types.
+
+
+Overloading can occur within the same class and does not require inheritance.
+
+
+Return type alone is not enough to distinguish overloaded methods.
+
+Overriding (Max 2)
+
+Overriding redefines an inherited instance method with the same signature in a subclass.
+
+
+Which overridden method runs is resolved at runtime based on the actual object type.
+
+
+Overriding supports polymorphism through dynamic dispatch.
+
+
+The overridden method typically keeps a compatible return type and cannot narrow checked exceptions arbitrarily.
+---
+Question
+How would you improve this code using Map.computeIfAbsent, and why is that improvement useful?
+
+Map&lt;String, List&lt;String&gt;&gt; tagsByUser = new HashMap&lt;&gt;();
+
+public void addTag(String userId, String tag) {
+    List&lt;String&gt; tags = tagsByUser.get(userId);
+    if (tags == null) {
+        tags = new ArrayList&lt;&gt;();
+        tagsByUser.put(userId, tags);
+    }
+    tags.add(tag);
+}
+Improvement (Max 2)
+
+Replace the get/null-check/put pattern with computeIfAbsent.
+
+
+Use tagsByUser.computeIfAbsent(userId, id -> new ArrayList<>()).add(tag).
+
+
+computeIfAbsent creates and inserts the value only when the key is absent or mapped to null.
+
+
+The mapping function runs only when initialization is needed.
+
+Why Useful (Max 2)
+
+Makes lazy initialization of map values concise and less error-prone.
+
+
+Avoids duplicating lookup and insert logic.
+
+
+Expresses the intent of “initialize if missing, then use” clearly.
+
+
+Reduces the chance of forgetting to put the new list into the map.
+
+--
+Question
+What is the difference between throw and throws in Java?
+
+throw (Max 2)
+
+throw is used to raise an exception at runtime.
+
+
+It appears inside a method body with an exception instance, such as throw new IllegalArgumentException(…).
+
+
+After throw executes, normal control flow stops and the exception propagates unless caught.
+
+
+throw is about producing and signaling a failure.
+
+throws (Max 2)
+
+throws is used in a method declaration to declare checked exceptions the method may propagate.
+
+
+It informs callers that they must handle or further declare those checked exceptions.
+
+
+throws does not itself raise an exception; it documents and enforces the method’s exception contract.
+
+
+Unchecked exceptions do not need to be declared with throws.
+
+
+---
+Question
+What is printed when this code executes, and why?
+
+Set&lt;String&gt; names = new HashSet&lt;&gt;();
+names.add("Ada");
+names.add("Alan");
+names.add("Ada");
+System.out.println(names.size());
+Output
+
+Prints 2.
+
+Why (Max 2)
+
+HashSet stores unique elements based on equals and hashCode.
+
+
+The second “Ada” is considered equal to the first and is not added as a new element.
+
+
+Duplicate values according to equals do not increase the set size.
+
+---
+Question
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+public class BankAccount {
+    public double balance;
+
+    public BankAccount(double balance) {
+        this.balance = balance;
+    }
+
+    public void deposit(double amount) {
+        balance += amount;
+    }
+}
+Design Problem
+
+The balance field is public, so callers can modify it directly.
+
+
+Direct field access bypasses any validation or business rules the class should enforce.
+
+Possible Improvements (Max 2)
+
+Make balance private and expose controlled methods such as deposit, withdraw, and getBalance.
+
+
+Validate amounts inside mutator methods so invariants cannot be broken.
+
+
+Avoid exposing mutable state that represents core domain invariants.
+
+Why (Max 2)
+
+Encapsulation protects invariants by controlling how state changes.
+
+
+Centralizes validation and business rules in one place.
+
+
+Makes the class safer and easier to maintain as requirements evolve
+
+--
+Question
+How would you refactor this code using Optional.map, and why is that improvement useful?
+
+public String cityName(Optional&lt;User&gt; user) {
+    if (user.isPresent()) {
+        Address address = user.get().getAddress();
+        if (address != null) {
+            return address.getCity();
+        }
+    }
+    return "Unknown";
+}
+Refactor (Max 2)
+
+Chain Optional.map calls to transform a present value.
+
+
+Use user.map(User::getAddress).map(Address::getCity).orElse(“Unknown”).
+
+
+map applies the function only when a value is present and propagates emptiness otherwise.
+
+
+Avoid nested isPresent/get checks when map expresses the transformation clearly.
+
+Why Useful (Max 2)
+
+Makes absence handling explicit and concise.
+
+
+Reduces nested null and presence checks.
+
+
+Keeps the happy-path transformation readable as a pipeline.
+
+
+Encourages safer Optional usage than repeated get calls.
+
+--What is the purpose of Optional in Java, and when is it appropriate to use?
+
+Purpose (Max 2)
+
+Optional is a container that may or may not hold a non-null value.
+
+
+It makes the possibility of absence explicit in method return types.
+
+
+It encourages callers to handle missing values intentionally rather than relying on null.
+
+
+It provides APIs such as map, flatMap, filter, and orElse for safe presence handling.
+
+When Appropriate (Max 2)
+
+Appropriate as a return type when a value might legitimately be absent.
+
+
+Not recommended as a field type or method parameter in most APIs.
+
+
+Should not replace every nullable reference; use it where absence is part of the contract.
+
+
+Prefer clear domain modeling of absence over returning null from lookup-style methods.

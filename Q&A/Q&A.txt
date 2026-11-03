@@ -1,0 +1,243 @@
+Question
+What is the difference between intermediate and terminal operations in a Java Stream pipeline?
+
+Intermediate Operations (Max 2)
+
+Intermediate operations return another Stream and can be chained.
+
+
+They are lazy and do not process elements until a terminal operation is invoked.
+
+
+Examples include filter, map, distinct, sorted, limit, and skip.
+
+
+They describe transformations or selections to apply to stream elements.
+
+Terminal Operations (Max 2)
+
+Terminal operations produce a result or side effect and end the pipeline.
+
+
+Invoking a terminal operation triggers execution of the pipeline.
+
+
+After a terminal operation, the stream cannot be reused.
+
+
+Examples include collect, reduce, forEach, count, anyMatch, and findFirst
+------
+Question
+What happens when this code executes, and why?
+
+Integer count = null;
+int value = count;
+What Happens
+
+The code throws NullPointerException at runtime.
+
+Why (Max 2)
+
+Assigning Integer to int requires unboxing.
+
+
+A null wrapper cannot be unboxed to a primitive.
+
+
+Wrapper types are nullable, unlike primitive int
+--------
+Question
+What is object polymorphism in Java, and how does it help you write flexible code?
+
+What Is Polymorphism (Max 2)
+
+Polymorphism allows the same interface or superclass type to refer to different concrete implementations.
+
+
+The method that runs is chosen at runtime based on the actual object type (dynamic dispatch).
+
+
+Subtypes can override behavior while callers program to a common abstraction.
+
+
+It is closely related to inheritance and interface implementation.
+
+Why Useful (Max 2)
+
+Lets you extend behavior by adding new implementations without changing callers.
+
+
+Reduces coupling to concrete classes.
+
+
+Enables interchangeable strategies behind a shared API.
+
+
+Makes code easier to test with alternate implementations or fakes.
+-------------
+Question
+Although this code works correctly for submitting work, it has a design problem. What is the problem, how would you improve the design, and why?
+
+public void process(List&lt;Runnable&gt; tasks) {
+    ExecutorService executor = Executors.newFixedThreadPool(4);
+    for (Runnable task : tasks) {
+        executor.submit(task);
+    }
+}
+Design Problem
+
+The ExecutorService is never shut down.
+
+
+Failing to shut down leaves threads running and can leak resources.
+
+Possible Improvements (Max 2)
+
+Call shutdown after submitting tasks, and awaitTermination when results must complete.
+
+
+Use try/finally to ensure shutdown even if submission fails.
+
+
+Prefer a shared, lifecycle-managed executor instead of creating one per method call when appropriate.
+
+Why (Max 2)
+
+Executor services own threads that will not exit until shut down.
+
+
+Proper shutdown prevents thread and memory leaks in long-running applications.
+
+
+Makes task execution lifecycle explicit and safer.
+-----------
+Question
+Given the code below, how would you refactor it using a lambda expression?
+
+List<String> words = Arrays.asList("Java", "Lambda", "Expression");
+
+Collections.sort(words, new Comparator&lt;String&gt;() {
+    @Override
+    public int compare(String s1, String s2) {
+        return s1.length() - s2.length();
+    }
+});</code></pre>
+Lambda Expression
+
+Replace the anonymous Comparator implementation with a lambda expression. This is possible because Comparator is a functional interface with a single abstract method.
+-----
+Question
+What is pattern matching for instanceof in Java, and what are some of its benefits?
+
+if (obj instanceof String s) {
+    System.out.println(s.length());
+}
+What It Is
+
+Pattern matching for instanceof lets Java check an object’s type and declare a typed variable in the same expression, avoiding a separate explicit cast.
+
+Benefits (Max 3)
+
+Reduces boilerplate by removing the need for a separate cast.
+
+
+Improves readability by keeping the type check and typed variable together.
+
+
+Improves type safety because the variable is only available where the type check succeeds.
+
+
+Reduces the risk of casting errors.
+
+
+Makes code involving type-specific logic easier to maintain.
+---
+Question
+What are the key differences between Comparable and Comparator in Java, and when would you use each?
+
+Key Differences (Max 4)
+
+Comparable defines the natural ordering of a class, while Comparator defines an external ordering.
+
+
+Comparable requires modifying the class by implementing the Comparable interface, while Comparator can be implemented separately without changing the class.
+
+
+Comparable defines a single default ordering, while multiple Comparator implementations can provide different sorting strategies.
+
+
+Comparable implements the compareTo() method, while Comparator implements the compare() method.
+
+
+Comparable is typically implemented by the class being sorted, while Comparator is supplied to sorting methods or collections when needed.
+
+When to Use
+
+Use Comparable when a class has a single, natural ordering that should always be available.
+
+
+Use Comparator when different sort orders are required or when the class cannot or should not implement Comparable.
+-----
+Question
+Although this code works correctly, it has a design problem. What is the problem, how would you improve the design, and why?
+
+import java.util.HashMap;
+import java.util.Map;
+
+class User {
+    private String username;
+
+    User(String username) {
+        this.username = username;
+    }
+
+    void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof User other
+            && username.equals(other.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return username.hashCode();
+    }
+}
+
+Map&lt;User, String&gt; userRoles = new HashMap&lt;&gt;();
+
+User user = new User("alice");
+userRoles.put(user, "Administrator");
+
+user.setUsername("bob");
+
+System.out.println(userRoles.get(user));
+Design Problem
+
+The object used as the HashMap key is mutable. Changing a field that is used by equals() and hashCode() after the object has been added to the map can prevent the entry from being found correctly.
+
+Possible Improvements (Max 2)
+
+Make the key object immutable.
+
+
+Do not modify fields that participate in equals() and hashCode() while the object is used as a map key.
+
+
+Alternatively, use an immutable identifier as the key (for example, String or UUID).
+
+Why (Max 2)
+
+Maintains a consistent hash code while the object is stored in the map.
+
+
+Preserves the HashMap contract and lookup behavior.
+
+
+Prevents difficult-to-diagnose lookup bugs.
+
+
+Produces more predictable and maintainable code.
